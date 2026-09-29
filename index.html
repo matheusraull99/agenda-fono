@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#5b8def">
-<title>Agenda Fono</title>
+<meta name="theme-color" content="#9b7fd9">
+<title>Bárbara Fono</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
-:root{--bg:#f5f7fb;--card:#fff;--tx:#1f2937;--mut:#6b7280;--pri:#5b8def;--pri-d:#3f6fd1;--ok:#22a06b;--warn:#e0a020;--bad:#d64545;--line:#e5e7eb}
-@media(prefers-color-scheme:dark){:root{--bg:#12151c;--card:#1b202b;--tx:#e8ebf2;--mut:#9aa3b5;--line:#2a3140}}
+:root{--bg:#faf7fd;--card:#fff;--tx:#2b2438;--mut:#7a7189;--pri:#9b7fd9;--pri-d:#7d5fc4;--rosa:#f4a6c6;--ok:#22a06b;--warn:#e0a020;--bad:#d64545;--line:#ebe4f5}
+@media(prefers-color-scheme:dark){:root{--bg:#16131e;--card:#211d2c;--tx:#efeaf7;--mut:#a79fb8;--line:#332c44}}
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:calc(72px + env(safe-area-inset-bottom))}
-header{background:var(--pri);color:#fff;padding:14px 16px calc(10px);position:sticky;top:0;z-index:5}
-header h1{margin:0;font-size:18px;font-weight:600}
+header{background:linear-gradient(120deg,var(--pri-d),var(--pri) 55%,var(--rosa));color:#fff;padding:14px 16px 12px;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:20px;font-weight:700;letter-spacing:.2px}header h1 small{font-size:13px;font-weight:400;opacity:.9;margin-left:6px}
 main{max-width:640px;margin:0 auto;padding:12px 16px}
 .nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 0 10px}
 .nav button{background:var(--card);border:1px solid var(--line);color:var(--tx);border-radius:10px;padding:8px 14px;font-size:16px}
@@ -23,7 +23,7 @@ main{max-width:640px;margin:0 auto;padding:12px 16px}
 .week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px}
 .week button{border:1px solid var(--line);background:var(--card);color:var(--tx);border-radius:10px;padding:6px 0;font-size:12px;position:relative}
 .week button b{display:block;font-size:16px}
-.week button.sel{background:var(--pri);color:#fff;border-color:var(--pri)}
+.week button.sel{background:linear-gradient(160deg,var(--pri),var(--rosa));color:#fff;border-color:var(--pri)}
 .week button.today:not(.sel){border-color:var(--pri)}
 .week button i{position:absolute;top:3px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--warn)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;border-left:5px solid var(--pri)}
@@ -38,7 +38,7 @@ main{max-width:640px;margin:0 auto;padding:12px 16px}
 .inst{background:var(--card);border:1px solid var(--pri);border-radius:14px;padding:12px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px}
 .empty{text-align:center;color:var(--mut);padding:40px 10px}
 .gap{color:var(--mut);font-size:12px;text-align:center;margin:-4px 0 8px}
-.fab{position:fixed;right:18px;bottom:calc(84px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:50%;background:var(--pri);color:#fff;border:0;font-size:30px;box-shadow:0 4px 14px rgba(0,0,0,.3);z-index:6}
+.fab{position:fixed;right:18px;bottom:calc(84px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:50%;background:linear-gradient(140deg,var(--pri),var(--rosa));color:#fff;border:0;font-size:30px;box-shadow:0 4px 14px rgba(0,0,0,.3);z-index:6}
 .tabs{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:6}
 .tabs button{flex:1;background:none;border:0;padding:10px 0;font-size:12px;color:var(--mut)}
 .tabs button span{display:block;font-size:20px}
@@ -62,7 +62,7 @@ input,select,textarea{font:inherit;padding:10px;border:1px solid var(--line);bor
 </style>
 </head>
 <body>
-<header><h1 id="h">Agenda Fono</h1></header>
+<header><h1 id="h">Bárbara Fono</h1></header>
 <main id="app"></main>
 <button class="fab" id="fab" aria-label="Novo agendamento">+</button>
 <nav class="tabs">
@@ -127,7 +127,7 @@ addEventListener('beforeinstallprompt',e=>{e.preventDefault();pInst=e;render()})
 addEventListener('appinstalled',()=>{pInst=null;render()});
 function instalarHtml(){
   if(standalone())return'';
-  return `<div class="inst"><span>📲 Tenha a agenda como app no celular</span><button class="btn p" data-inst="1">Instalar</button></div>`;
+  return `<div class="inst"><span>📲 Instale a agenda da Bárbara no celular</span><button class="btn p" data-inst="1">Instalar</button></div>`;
 }
 async function instalar(){
   if(pInst){pInst.prompt();await pInst.userChoice;pInst=null;render();return}
@@ -140,8 +140,9 @@ function render(){
   if(tab==='agenda')vAgenda();else if(tab==='pacientes')vPac();else vSet();
 }
 
+function hd(t){$('#h').innerHTML='Bárbara Fono <small>· '+t+'</small>'}
 function vAgenda(){
-  $('#h').textContent='Agenda Fono';
+  hd('Agenda');
   const hoje=iso(new Date());
   const seg=addDays(cur,-((pd(cur).getDay()+6)%7));
   let wk='';
@@ -177,7 +178,7 @@ function vAgenda(){
 }
 
 function vPac(){
-  $('#h').textContent='Pacientes';
+  hd('Pacientes');
   const m=new Map();
   for(const a of db.appts){const k=a.patient.trim().toLowerCase();const p=m.get(k)||{nome:a.patient,tel:'',n:0,f:0,prox:null,ult:null};
     if(a.phone)p.tel=a.phone;if(a.status==='realizado')p.n++;if(a.status==='faltou')p.f++;
@@ -198,7 +199,7 @@ function vPac(){
 }
 
 function vSet(){
-  $('#h').textContent='Ajustes';
+  hd('Ajustes');
   const mes=iso(new Date()).slice(0,7);
   const doMes=db.appts.filter(a=>a.date.startsWith(mes));
   const c=s=>doMes.filter(a=>a.status===s).length;
@@ -212,7 +213,7 @@ function vSet(){
     <button class="btn p" id="bx">⬇️ Baixar backup</button>
     <button class="btn" id="bi">⬆️ Restaurar backup</button><input type="file" id="bf" accept=".json" hidden></div>`;
   $('#csm').onclick=()=>{db.cfg.msg=$('#cm').value;save();alert('Mensagem salva.')};
-  $('#bx').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(db)],{type:'application/json'}));a.download='agenda-fono-'+iso(new Date())+'.json';a.click()};
+  $('#bx').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(db)],{type:'application/json'}));a.download='barbara-fono-'+iso(new Date())+'.json';a.click()};
   $('#bi').onclick=()=>$('#bf').click();
   $('#bf').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());if(!Array.isArray(d.appts))throw 0;if(confirm('Substituir todos os dados atuais pelo backup?')){db=d;db.cfg=db.cfg||{msg:''};save();render()}}catch{alert('Arquivo inválido.')}};
 }

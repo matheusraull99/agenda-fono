@@ -1,12 +1,12 @@
 {
-  "name": "Agenda Fono",
-  "short_name": "Agenda Fono",
-  "description": "Agenda de atendimentos de fonoaudiologia",
+  "name": "Bárbara Fono",
+  "short_name": "Bárbara Fono",
+  "description": "Agenda de atendimentos da fonoaudióloga Bárbara",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f5f7fb",
-  "theme_color": "#5b8def",
+  "background_color": "#faf7fd",
+  "theme_color": "#9b7fd9",
   "lang": "pt-BR",
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
