@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#5b8def">
+<title>Agenda Fono</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--tx:#1f2937;--mut:#6b7280;--pri:#5b8def;--pri-d:#3f6fd1;--ok:#22a06b;--warn:#e0a020;--bad:#d64545;--line:#e5e7eb}
+@media(prefers-color-scheme:dark){:root{--bg:#12151c;--card:#1b202b;--tx:#e8ebf2;--mut:#9aa3b5;--line:#2a3140}}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+header{background:var(--pri);color:#fff;padding:14px 16px calc(10px);position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:18px;font-weight:600}
+main{max-width:640px;margin:0 auto;padding:12px 16px}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 0 10px}
+.nav button{background:var(--card);border:1px solid var(--line);color:var(--tx);border-radius:10px;padding:8px 14px;font-size:16px}
+.nav .title{text-align:center;flex:1;font-weight:600}.nav .title::first-letter{text-transform:uppercase}
+.nav .title small{display:block;color:var(--mut);font-weight:400;text-transform:none}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px}
+.week button{border:1px solid var(--line);background:var(--card);color:var(--tx);border-radius:10px;padding:6px 0;font-size:12px;position:relative}
+.week button b{display:block;font-size:16px}
+.week button.sel{background:var(--pri);color:#fff;border-color:var(--pri)}
+.week button.today:not(.sel){border-color:var(--pri)}
+.week button i{position:absolute;top:3px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--warn)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;border-left:5px solid var(--pri)}
+.card.realizado{border-left-color:var(--ok)}.card.faltou{border-left-color:var(--warn)}.card.cancelado{border-left-color:var(--bad);opacity:.6}
+.card .top{display:flex;justify-content:space-between;gap:8px}
+.card .hora{font-weight:700;font-size:17px}
+.card .nome{font-weight:600}
+.card .sub{color:var(--mut);font-size:13px;margin-top:2px}
+.tag{font-size:11px;padding:2px 8px;border-radius:99px;background:var(--bg);border:1px solid var(--line);color:var(--mut);white-space:nowrap;align-self:flex-start}
+.acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.acts button,.acts a{font-size:13px;border:1px solid var(--line);background:var(--bg);color:var(--tx);border-radius:8px;padding:6px 10px;text-decoration:none}
+.empty{text-align:center;color:var(--mut);padding:40px 10px}
+.gap{color:var(--mut);font-size:12px;text-align:center;margin:-4px 0 8px}
+.fab{position:fixed;right:18px;bottom:calc(84px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:50%;background:var(--pri);color:#fff;border:0;font-size:30px;box-shadow:0 4px 14px rgba(0,0,0,.3);z-index:6}
+.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:6}
+.tabs button{flex:1;background:none;border:0;padding:10px 0;font-size:12px;color:var(--mut)}
+.tabs button span{display:block;font-size:20px}
+.tabs button.on{color:var(--pri);font-weight:600}
+dialog{border:0;border-radius:16px;padding:0;width:min(94vw,460px);background:var(--card);color:var(--tx);max-height:92vh}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+form{padding:16px;display:grid;gap:10px}
+form h2{margin:0 0 4px;font-size:18px}
+label{font-size:13px;color:var(--mut);display:grid;gap:4px}
+input,select,textarea{font:inherit;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--tx);width:100%}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btns{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+.btn{border:0;border-radius:10px;padding:10px 16px;font-size:15px;background:var(--bg);color:var(--tx);border:1px solid var(--line)}
+.btn.p{background:var(--pri);color:#fff;border-color:var(--pri)}
+.btn.d{color:var(--bad)}
+.conf{color:var(--bad);font-size:13px}
+.set{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;display:grid;gap:10px}
+.set h3{margin:0;font-size:15px}.set p{margin:0;color:var(--mut);font-size:13px}
+.stat{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}
+.stat div{background:var(--bg);border-radius:10px;padding:8px 2px;font-size:11px;color:var(--mut)}.stat b{display:block;font-size:18px;color:var(--tx)}
+</style>
+</head>
+<body>
+<header><h1 id="h">Agenda Fono</h1></header>
+<main id="app"></main>
+<button class="fab" id="fab" aria-label="Novo agendamento">+</button>
+<nav class="tabs">
+  <button data-t="agenda" class="on"><span>📅</span>Agenda</button>
+  <button data-t="pacientes"><span>👥</span>Pacientes</button>
+  <button data-t="ajustes"><span>⚙️</span>Ajustes</button>
+</nav>
+
+<dialog id="dlg"><form id="f" method="dialog">
+  <h2 id="ft">Novo agendamento</h2>
+  <label>Paciente<input id="fp" list="pl" required autocomplete="off" placeholder="Nome do paciente"></label>
+  <datalist id="pl"></datalist>
+  <label>WhatsApp (com DDD)<input id="ftel" type="tel" inputmode="tel" placeholder="(11) 99999-9999"></label>
+  <div class="row">
+    <label>Data<input id="fd" type="date" required></label>
+    <label>Horário<input id="fh" type="time" required step="300"></label>
+  </div>
+  <div class="row">
+    <label>Duração<select id="fdur"><option value="30">30 min</option><option value="45">45 min</option><option value="60">60 min</option><option value="90">90 min</option></select></label>
+    <label>Tipo<select id="ft2"></select></label>
+  </div>
+  <label id="rep">Repetir toda semana por<select id="frep"><option value="1">Não repetir</option><option value="4">4 semanas</option><option value="8">8 semanas</option><option value="12">12 semanas</option><option value="24">24 semanas</option></select></label>
+  <label>Observações<textarea id="fn" rows="2" placeholder="Objetivo da sessão, queixa, etc."></textarea></label>
+  <div class="conf" id="fc"></div>
+  <div class="btns">
+    <button type="button" class="btn d" id="fdel" hidden>Excluir</button>
+    <button type="button" class="btn" id="fx">Cancelar</button>
+    <button class="btn p" id="fs" value="ok">Salvar</button>
+  </div>
+</form></dialog>
+
+<script>
+const $=s=>document.querySelector(s);
+const KEY='agenda-fono-v1';
+const TIPOS=['Avaliação','Terapia','Retorno','Reavaliação','Devolutiva','Orientação aos pais'];
+const ST={agendado:'Agendado',realizado:'Realizado',faltou:'Faltou',cancelado:'Cancelado'};
+let db=load(),tab='agenda',cur=iso(new Date()),editing=null,busca='';
+
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{appts:[],cfg:{msg:'Olá, {nome}! Passando para lembrar da sua sessão de fonoaudiologia {dia}, às {hora}. Pode confirmar presença? 😊'}}}catch{return{appts:[],cfg:{msg:''}}}}
+function save(){localStorage.setItem(KEY,JSON.stringify(db))}
+function iso(d){const z=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())}
+function pd(s){const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c)}
+function addDays(s,n){const d=pd(s);d.setDate(d.getDate()+n);return iso(d)}
+function mins(h){const[a,b]=h.split(':').map(Number);return a*60+b}
+function fmtHora(m){const z=n=>String(n).padStart(2,'0');return z(Math.floor(m/60))+':'+z(m%60)}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+const uid=()=>Math.random().toString(36).slice(2,10);
+const dl=(s,o)=>pd(s).toLocaleDateString('pt-BR',o);
+
+function diaTexto(s){const h=iso(new Date());if(s===h)return'hoje';if(s===addDays(h,1))return'amanhã';return dl(s,{weekday:'long',day:'numeric',month:'long'})}
+function wa(a){
+  const tel=(a.phone||'').replace(/\D/g,'');if(!tel)return null;
+  const msg=(db.cfg.msg||'').replace('{nome}',a.patient.split(' ')[0]).replace('{dia}',diaTexto(a.date)).replace('{hora}',a.time);
+  return'https://wa.me/'+(tel.length<=11?'55'+tel:tel)+'?text='+encodeURIComponent(msg);
+}
+
+function render(){
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
+  $('#fab').style.display=tab==='ajustes'?'none':'';
+  if(tab==='agenda')vAgenda();else if(tab==='pacientes')vPac();else vSet();
+}
+
+function vAgenda(){
+  $('#h').textContent='Agenda Fono';
+  const hoje=iso(new Date());
+  const seg=addDays(cur,-((pd(cur).getDay()+6)%7));
+  let wk='';
+  for(let i=0;i<7;i++){const d=addDays(seg,i);const n=db.appts.filter(a=>a.date===d&&a.status!=='cancelado').length;
+    wk+=`<button data-d="${d}" class="${d===cur?'sel':''} ${d===hoje?'today':''}">${dl(d,{weekday:'short'}).replace('.','')}<b>${pd(d).getDate()}</b>${n?'<i></i>':''}</button>`}
+  const list=db.appts.filter(a=>a.date===cur).sort((a,b)=>a.time.localeCompare(b.time));
+  const ativos=list.filter(a=>a.status!=='cancelado');
+  const tot=ativos.reduce((s,a)=>s+a.dur,0);
+  let html=`<div class="nav"><button data-n="-7">«</button><button data-n="-1">‹</button>
+    <div class="title">${dl(cur,{weekday:'long',day:'numeric',month:'long'})}<small>${ativos.length} atendimento(s) · ${Math.floor(tot/60)}h${String(tot%60).padStart(2,'0')}</small></div>
+    <button data-n="1">›</button><button data-n="7">»</button></div>
+    <div class="week">${wk}</div>`;
+  if(cur!==hoje)html+=`<div class="acts" style="margin:-4px 0 10px"><button data-n="hoje">Ir para hoje</button></div>`;
+  if(!list.length)html+='<div class="empty">Nenhum atendimento neste dia.<br>Toque no <b>+</b> para agendar.</div>';
+  let prevEnd=null;
+  for(const a of list){
+    if(a.status!=='cancelado'){
+      const ini=mins(a.time);
+      if(prevEnd!==null&&ini-prevEnd>=30)html+=`<div class="gap">⏳ Livre das ${fmtHora(prevEnd)} às ${a.time} (${ini-prevEnd} min)</div>`;
+      prevEnd=Math.max(prevEnd??0,ini+a.dur);
+    }
+    const link=wa(a);
+    html+=`<div class="card ${a.status}"><div class="top"><div><div class="hora">${a.time}<span class="sub"> – ${fmtHora(mins(a.time)+a.dur)}</span></div>
+      <div class="nome">${esc(a.patient)}</div><div class="sub">${esc(a.type)}${a.notes?' · '+esc(a.notes):''}</div></div><span class="tag">${ST[a.status]}</span></div>
+      <div class="acts">
+      ${a.status!=='realizado'?`<button data-s="realizado" data-id="${a.id}">✅ Realizado</button>`:''}
+      ${a.status!=='faltou'?`<button data-s="faltou" data-id="${a.id}">🚫 Faltou</button>`:''}
+      ${a.status!=='cancelado'?`<button data-s="cancelado" data-id="${a.id}">❌ Cancelar</button>`:`<button data-s="agendado" data-id="${a.id}">↩️ Reativar</button>`}
+      ${link?`<a href="${link}" target="_blank" rel="noopener">💬 Lembrar</a>`:''}
+      <button data-e="${a.id}">✏️ Editar</button></div></div>`;
+  }
+  $('#app').innerHTML=html;
+}
+
+function vPac(){
+  $('#h').textContent='Pacientes';
+  const m=new Map();
+  for(const a of db.appts){const k=a.patient.trim().toLowerCase();const p=m.get(k)||{nome:a.patient,tel:'',n:0,f:0,prox:null,ult:null};
+    if(a.phone)p.tel=a.phone;if(a.status==='realizado')p.n++;if(a.status==='faltou')p.f++;
+    if(a.status==='agendado'&&a.date>=iso(new Date())&&(!p.prox||a.date+a.time<p.prox))p.prox=a.date+a.time;
+    if(a.status==='realizado'&&(!p.ult||a.date>p.ult))p.ult=a.date;m.set(k,p)}
+  let ps=[...m.values()].sort((a,b)=>a.nome.localeCompare(b.nome));
+  if(busca)ps=ps.filter(p=>p.nome.toLowerCase().includes(busca.toLowerCase()));
+  let h=`<input id="bq" placeholder="🔍 Buscar paciente" value="${esc(busca)}" style="margin-bottom:12px">`;
+  if(!ps.length)h+='<div class="empty">Nenhum paciente ainda.</div>';
+  for(const p of ps){
+    h+=`<div class="card"><div class="top"><div><div class="nome">${esc(p.nome)}</div>
+      <div class="sub">${p.n} sessão(ões) realizada(s)${p.f?' · '+p.f+' falta(s)':''}</div>
+      <div class="sub">${p.prox?'Próxima: '+dl(p.prox.slice(0,10),{day:'2-digit',month:'2-digit'})+' às '+p.prox.slice(11):'Sem próxima sessão marcada'}</div></div></div>
+      <div class="acts"><button data-novo="${esc(p.nome)}" data-tel="${esc(p.tel)}">➕ Agendar</button>
+      ${p.tel?`<a href="https://wa.me/${p.tel.replace(/\D/g,'').length<=11?'55':''}${p.tel.replace(/\D/g,'')}" target="_blank" rel="noopener">💬 WhatsApp</a>`:''}</div></div>`}
+  $('#app').innerHTML=h;
+  const q=$('#bq');q.oninput=()=>{busca=q.value;const pos=q.selectionStart;vPac();const n=$('#bq');n.focus();n.setSelectionRange(pos,pos)};
+}
+
+function vSet(){
+  $('#h').textContent='Ajustes';
+  const mes=iso(new Date()).slice(0,7);
+  const doMes=db.appts.filter(a=>a.date.startsWith(mes));
+  const c=s=>doMes.filter(a=>a.status===s).length;
+  $('#app').innerHTML=`
+  <div class="set"><h3>Resumo do mês</h3><div class="stat">
+    <div><b>${c('agendado')}</b>Agendados</div><div><b>${c('realizado')}</b>Realizados</div><div><b>${c('faltou')}</b>Faltas</div><div><b>${c('cancelado')}</b>Cancelados</div></div></div>
+  <div class="set"><h3>Mensagem de lembrete (WhatsApp)</h3>
+    <p>Use {nome}, {dia} e {hora}.</p><textarea id="cm" rows="4">${esc(db.cfg.msg)}</textarea>
+    <button class="btn p" id="csm">Salvar mensagem</button></div>
+  <div class="set"><h3>Backup</h3><p>Os dados ficam só neste aparelho. Faça backup de vez em quando e guarde no WhatsApp, e-mail ou Drive.</p>
+    <button class="btn p" id="bx">⬇️ Baixar backup</button>
+    <button class="btn" id="bi">⬆️ Restaurar backup</button><input type="file" id="bf" accept=".json" hidden></div>`;
+  $('#csm').onclick=()=>{db.cfg.msg=$('#cm').value;save();alert('Mensagem salva.')};
+  $('#bx').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(db)],{type:'application/json'}));a.download='agenda-fono-'+iso(new Date())+'.json';a.click()};
+  $('#bi').onclick=()=>$('#bf').click();
+  $('#bf').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());if(!Array.isArray(d.appts))throw 0;if(confirm('Substituir todos os dados atuais pelo backup?')){db=d;db.cfg=db.cfg||{msg:''};save();render()}}catch{alert('Arquivo inválido.')}};
+}
+
+/* ----- formulário ----- */
+$('#ft2').innerHTML=TIPOS.map(t=>`<option>${t}</option>`).join('');
+function abrir(a,pre){
+  editing=a?a.id:null;
+  $('#ft').textContent=a?'Editar agendamento':'Novo agendamento';
+  $('#fp').value=a?a.patient:(pre?.nome||'');
+  $('#ftel').value=a?a.phone||'':(pre?.tel||'');
+  $('#fd').value=a?a.date:cur;
+  $('#fh').value=a?a.time:'08:00';
+  $('#fdur').value=a?a.dur:45;
+  $('#ft2').value=a?a.type:TIPOS[1];
+  $('#fn').value=a?a.notes||'':'';
+  $('#frep').value=1;$('#rep').hidden=!!a;
+  $('#fdel').hidden=!a;$('#fc').textContent='';
+  $('#pl').innerHTML=[...new Set(db.appts.map(x=>x.patient))].map(n=>`<option value="${esc(n)}">`).join('');
+  $('#dlg').showModal();
+}
+$('#fp').addEventListener('change',()=>{const p=$('#fp').value.trim().toLowerCase();const a=[...db.appts].reverse().find(x=>x.patient.toLowerCase()===p&&x.phone);if(a&&!$('#ftel').value)$('#ftel').value=a.phone});
+$('#fx').onclick=()=>$('#dlg').close();
+$('#fdel').onclick=()=>{const a=db.appts.find(x=>x.id===editing);if(!a)return;
+  const serie=a.serie&&db.appts.filter(x=>x.serie===a.serie&&x.date>a.date).length;
+  if(serie&&confirm('Excluir também as próximas sessões desta série?\n\nOK = esta e as próximas\nCancelar = só esta')){db.appts=db.appts.filter(x=>!(x.serie===a.serie&&x.date>=a.date))}
+  else if(confirm('Excluir este agendamento?'))db.appts=db.appts.filter(x=>x.id!==editing);else return;
+  save();$('#dlg').close();render()};
+function conflito(date,time,dur,ignora){
+  const i=mins(time),f=i+dur;
+  return db.appts.find(x=>x.date===date&&x.status!=='cancelado'&&!ignora.includes(x.id)&&mins(x.time)<f&&i<mins(x.time)+x.dur);
+}
+$('#f').addEventListener('submit',e=>{
+  e.preventDefault();
+  const base={patient:$('#fp').value.trim(),phone:$('#ftel').value.trim(),time:$('#fh').value,dur:+$('#fdur').value,type:$('#ft2').value,notes:$('#fn').value.trim()};
+  const date=$('#fd').value;
+  if(editing){
+    const c=conflito(date,base.time,base.dur,[editing]);
+    if(c&&!confirm(`Conflito com ${c.patient} (${c.time}). Salvar mesmo assim?`))return;
+    Object.assign(db.appts.find(x=>x.id===editing),base,{date});
+  }else{
+    const n=+$('#frep').value,serie=n>1?uid():null;const cs=[];
+    for(let i=0;i<n;i++){const d=addDays(date,7*i);const c=conflito(d,base.time,base.dur,[]);if(c)cs.push(`${dl(d,{day:'2-digit',month:'2-digit'})} (${c.patient} às ${c.time})`)}
+    if(cs.length&&!confirm('Conflito de horário em:\n'+cs.join('\n')+'\n\nAgendar mesmo assim?'))return;
+    for(let i=0;i<n;i++)db.appts.push({id:uid(),serie,...base,date:addDays(date,7*i),status:'agendado'});
+  }
+  save();cur=date;$('#dlg').close();tab='agenda';render();
+});
+
+/* ----- eventos ----- */
+$('#fab').onclick=()=>abrir();
+document.querySelector('.tabs').onclick=e=>{const b=e.target.closest('button');if(b){tab=b.dataset.t;render();scrollTo(0,0)}};
+$('#app').onclick=e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.d){cur=b.dataset.d;render()}
+  else if(b.dataset.n){cur=b.dataset.n==='hoje'?iso(new Date()):addDays(cur,+b.dataset.n);render()}
+  else if(b.dataset.s){db.appts.find(x=>x.id===b.dataset.id).status=b.dataset.s;save();render()}
+  else if(b.dataset.e)abrir(db.appts.find(x=>x.id===b.dataset.e));
+  else if(b.dataset.novo!==undefined)abrir(null,{nome:b.dataset.novo,tel:b.dataset.tel});
+};
+let tx=0;$('#app').addEventListener('touchstart',e=>tx=e.touches[0].clientX,{passive:true});
+$('#app').addEventListener('touchend',e=>{if(tab!=='agenda')return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>80){cur=addDays(cur,dx<0?1:-1);render()}});
+
+render();
+if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

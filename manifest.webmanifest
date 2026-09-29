@@ -1,0 +1,12 @@
+{
+  "name": "Agenda Fono",
+  "short_name": "Agenda Fono",
+  "description": "Agenda de atendimentos de fonoaudiologia",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f7fb",
+  "theme_color": "#5b8def",
+  "lang": "pt-BR",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
