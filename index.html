@@ -7,7 +7,7 @@
 <title>Agenda Fono</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg">
-<link rel="apple-touch-icon" href="icon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
 :root{--bg:#f5f7fb;--card:#fff;--tx:#1f2937;--mut:#6b7280;--pri:#5b8def;--pri-d:#3f6fd1;--ok:#22a06b;--warn:#e0a020;--bad:#d64545;--line:#e5e7eb}
 @media(prefers-color-scheme:dark){:root{--bg:#12151c;--card:#1b202b;--tx:#e8ebf2;--mut:#9aa3b5;--line:#2a3140}}
@@ -35,6 +35,7 @@ main{max-width:640px;margin:0 auto;padding:12px 16px}
 .tag{font-size:11px;padding:2px 8px;border-radius:99px;background:var(--bg);border:1px solid var(--line);color:var(--mut);white-space:nowrap;align-self:flex-start}
 .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .acts button,.acts a{font-size:13px;border:1px solid var(--line);background:var(--bg);color:var(--tx);border-radius:8px;padding:6px 10px;text-decoration:none}
+.inst{background:var(--card);border:1px solid var(--pri);border-radius:14px;padding:12px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px}
 .empty{text-align:center;color:var(--mut);padding:40px 10px}
 .gap{color:var(--mut);font-size:12px;text-align:center;margin:-4px 0 8px}
 .fab{position:fixed;right:18px;bottom:calc(84px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:50%;background:var(--pri);color:#fff;border:0;font-size:30px;box-shadow:0 4px 14px rgba(0,0,0,.3);z-index:6}
@@ -118,6 +119,21 @@ function wa(a){
   return'https://wa.me/'+(tel.length<=11?'55'+tel:tel)+'?text='+encodeURIComponent(msg);
 }
 
+
+let pInst=null;
+const standalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();pInst=e;render()});
+addEventListener('appinstalled',()=>{pInst=null;render()});
+function instalarHtml(){
+  if(standalone())return'';
+  return `<div class="inst"><span>📲 Tenha a agenda como app no celular</span><button class="btn p" data-inst="1">Instalar</button></div>`;
+}
+async function instalar(){
+  if(pInst){pInst.prompt();await pInst.userChoice;pInst=null;render();return}
+  const t=ios?['No iPhone (Safari):','1. Toque no botão Compartilhar (quadrado com seta)','2. Escolha "Adicionar à Tela de Início"','3. Toque em Adicionar']:['No Android (Chrome):','1. Toque nos três pontinhos ⋮ no canto','2. Escolha "Instalar app" ou "Adicionar à tela inicial"'];
+  alert(t.join('\n'));
+}
 function render(){
   document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
   $('#fab').style.display=tab==='ajustes'?'none':'';
@@ -134,7 +150,7 @@ function vAgenda(){
   const list=db.appts.filter(a=>a.date===cur).sort((a,b)=>a.time.localeCompare(b.time));
   const ativos=list.filter(a=>a.status!=='cancelado');
   const tot=ativos.reduce((s,a)=>s+a.dur,0);
-  let html=`<div class="nav"><button data-n="-7">«</button><button data-n="-1">‹</button>
+  let html=instalarHtml()+`<div class="nav"><button data-n="-7">«</button><button data-n="-1">‹</button>
     <div class="title">${dl(cur,{weekday:'long',day:'numeric',month:'long'})}<small>${ativos.length} atendimento(s) · ${Math.floor(tot/60)}h${String(tot%60).padStart(2,'0')}</small></div>
     <button data-n="1">›</button><button data-n="7">»</button></div>
     <div class="week">${wk}</div>`;
@@ -186,7 +202,7 @@ function vSet(){
   const mes=iso(new Date()).slice(0,7);
   const doMes=db.appts.filter(a=>a.date.startsWith(mes));
   const c=s=>doMes.filter(a=>a.status===s).length;
-  $('#app').innerHTML=`
+  $('#app').innerHTML=instalarHtml()+`
   <div class="set"><h3>Resumo do mês</h3><div class="stat">
     <div><b>${c('agendado')}</b>Agendados</div><div><b>${c('realizado')}</b>Realizados</div><div><b>${c('faltou')}</b>Faltas</div><div><b>${c('cancelado')}</b>Cancelados</div></div></div>
   <div class="set"><h3>Mensagem de lembrete (WhatsApp)</h3>
@@ -251,7 +267,8 @@ $('#fab').onclick=()=>abrir();
 document.querySelector('.tabs').onclick=e=>{const b=e.target.closest('button');if(b){tab=b.dataset.t;render();scrollTo(0,0)}};
 $('#app').onclick=e=>{
   const b=e.target.closest('button');if(!b)return;
-  if(b.dataset.d){cur=b.dataset.d;render()}
+  if(b.dataset.inst)instalar();
+  else if(b.dataset.d){cur=b.dataset.d;render()}
   else if(b.dataset.n){cur=b.dataset.n==='hoje'?iso(new Date()):addDays(cur,+b.dataset.n);render()}
   else if(b.dataset.s){db.appts.find(x=>x.id===b.dataset.id).status=b.dataset.s;save();render()}
   else if(b.dataset.e)abrir(db.appts.find(x=>x.id===b.dataset.e));
